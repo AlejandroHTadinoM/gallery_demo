@@ -1,0 +1,16 @@
+{
+  "name": "gallery_demo",
+  "version": "1.0.0",
+  "description": "Gallery portfolio project width MaterializeCss",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlejandroHTadinoM/gallery_demo.git"
+  },
+  "author": "Alejandro H Tadino M",
+  "license": "ISC",
+
+}
