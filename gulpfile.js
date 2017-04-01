@@ -27,8 +27,9 @@ var viewsDist = 'dist/';
 /*========== Views: Templating engine compiling ==========*/
 gulp.task('Views', function () {
 	return gulp.src(viewsSrc)
-	.pipe(pug({
-		pretty: false
+	.pipe(
+		pug({
+			pretty: false
 	}))
 	.pipe(gulp.dest(viewsDist))
 	.change(BS.reload);
@@ -37,23 +38,28 @@ gulp.task('Views', function () {
 /*========== Styles: Sass compiling and compressing ==========*/
 gulp.task('Styles', function() {
   return gulp.src(stylesSrc)
-    .pipe(sass({
-    	outputStyle: 'compressed'
-	  }).on('error', sass.logError))
-	  .pipe(autoPrefixer({
-	  	browsers: ['last 2 versions'],
-      cascade: false
+    .pipe(
+    	sass({
+	    	outputStyle: 'compressed'
+	  })
+    .on('error', sass.logError))
+	.pipe(
+		autoPrefixer({
+		  browsers: ['last 2 versions'],
+	      cascade: false
+	}))
+	.pipe(
+		cleanCSS({
+		  compatibility: 'ie8',
+		  debug: true
+		}, function (e){
+		  	console.log(e.name + ': ' + e.stats.originalSize);
+		  	console.log(e.name + ': ' + e.stats.minifiedSize);
 	  }))
-	  .pipe(cleanCSS({
-	  	compatibility: 'ie8',
-	  	debug: true
-	  }, function (e){
-	  	console.log(e.name + ': ' + e.stats.originalSize);
-	  	console.log(e.name + ': ' + e.stats.minifiedSize);
-	  }))
-	  .pipe(rename({
-	  	sufix: '.min',
-	  	extname: '.css'
+	  .pipe(
+	  	rename({
+		  	sufix: '.min',
+		  	extname: '.css'
 	  }))
 	  .pipe(gulp.dest(stylesDist))
 	  .pipe(BS.stream());
@@ -62,13 +68,15 @@ gulp.task('Styles', function() {
 /*========== JS: JavaScript files concat, compress and renamed ==========*/
 gulp.task('JS', function() {
   return gulp.src(jsSrc)
-    .pipe(concat('scripts.js', {
-    	newLine: ';'
+    .pipe(
+    	concat('scripts.js', {
+	    	newLine: ';'
     }))
     .pipe(uglify())
-    .pipe(remane({
-    	sufix: '.min',
-    	extname: '.js'
+    .pipe(
+    	remane({
+	    	sufix: '.min',
+	    	extname: '.js'
     }))
     .pipe(gulp.dest(jsDist))
     .change(BS.reload);
