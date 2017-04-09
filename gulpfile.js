@@ -1,100 +1,78 @@
 var gulp = require('gulp');
-
 // Sass compiling
 var sass = require('gulp-sass');
 var autoPrefixer = require('gulp-autoprefixer');
 var cleanCSS = require('gulp-clean-css');
-
 // Views compiling
 var pug = require('gulp-pug');
-
 // Server
 var BS = require('browser-sync');
-
 // JS Concat and minify
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
-var remane = require('gulp-rename');
-
-// Paths
-var stylesSrc = 'assets/sass/*.sass';
-var stylesDist = 'dist/csss/';
-var jsSrc = 'assets/js/*.js';
-var jsDist = 'dist/js/';
-var viewsSrc = 'views/*.pug';
-var viewsDist = 'dist/';
-
+var rename = require('gulp-rename');
+// Image Minification
+var imgMin = require('gulp-imagemin');
 /*========== Views: Templating engine compiling ==========*/
 gulp.task('Views', function () {
-	return gulp.src(viewsSrc)
-	.pipe(
-		pug({
-			pretty: false
+	return gulp.src('views/*.pug')
+	.pipe(pug({
+		pretty: false
 	}))
-	.pipe(gulp.dest(viewsDist))
-	.change(BS.reload);
+	.pipe(gulp.dest('dist/'))
+	.on('change', BS.reload);
 });
-
 /*========== Styles: Sass compiling and compressing ==========*/
 gulp.task('Styles', function() {
-  return gulp.src(stylesSrc)
-    .pipe(
-    	sass({
-	    	outputStyle: 'compressed'
-	  })
-    .on('error', sass.logError))
-	.pipe(
-		autoPrefixer({
-		  browsers: ['last 2 versions'],
-	      cascade: false
+  return gulp.src('assets/sass/*.sass')
+    .pipe(sass().on('error', sass.logError))
+	.pipe(autoPrefixer({
+		browsers: ['last 2 versions']
 	}))
-	.pipe(
-		cleanCSS({
-		  compatibility: 'ie8',
-		  debug: true
-		}, function (e){
-		  	console.log(e.name + ': ' + e.stats.originalSize);
-		  	console.log(e.name + ': ' + e.stats.minifiedSize);
-	  }))
-	  .pipe(
-	  	rename({
-		  	sufix: '.min',
-		  	extname: '.css'
-	  }))
-	  .pipe(gulp.dest(stylesDist))
-	  .pipe(BS.stream());
+	.pipe(cleanCSS())
+	.pipe(rename({
+		sufix: '.min'
+	}))
+	.pipe(gulp.dest('dist/css/'))
+	.pipe(BS.stream());
 });
-
 /*========== JS: JavaScript files concat, compress and renamed ==========*/
 gulp.task('JS', function() {
-  return gulp.src(jsSrc)
-    .pipe(
-    	concat('scripts.js', {
+  return gulp.src('assets/js/*.js')
+    .pipe(concat('scripts.js', {
 	    	newLine: ';'
     }))
     .pipe(uglify())
-    .pipe(
-    	remane({
+    .pipe(rename({
 	    	sufix: '.min',
 	    	extname: '.js'
     }))
-    .pipe(gulp.dest(jsDist))
-    .change(BS.reload);
+    .pipe(gulp.dest('dist/js/'))
+    .on('change', BS.reload);
 });
-
+/*========== imgMin: Image minification ==========*/
+gulp.task('imgMin', function() {
+    return gulp.src('assets/img/')
+      .pipe(imgMin([
+      		imagemin.gifsicle({interlaced: true}),
+			imagemin.jpegtran({progressive: true}),
+			imagemin.optipng({optimizationLevel: 5}),
+			imagemin.svgo({plugins: [{removeViewBox: true}]})
+      	]))
+      .pipe(gulp.dest('dist/img'));
+});
 /*========== Serve: DEV Server running ==========*/
-gulp.task('Serve', ['Views', 'Styles', 'JS', 'Watch'], function () {
+gulp.task('Serve', ['Watch'], function () {
 	BS.init({
 		server: './dist'
 	});
 });
-
 /*========== Watch: Watch files for changes ==========*/
 gulp.task('Watch', function () {
-	gulp.watch(stylesSrc, ['sass']);
-	gulp.watch(jsSrc, ['concat']);
-	gulp.watch(viewsSrc, ['views']);
+	gulp.watch('assets/sass/*.sass', ['sass']);
+	gulp.watch('assets/js/*.js', ['concat']);
+	gulp.watch('views/*.pug', ['views']);
+	gulp.watch('assets/img', ['imgMin']);
 });
-
 /*========== Default gulp task ==========*/
-gulp.task('default', ['Serve']);
+gulp.task('default', ['Views', 'Styles', 'JS', 'Serve']);

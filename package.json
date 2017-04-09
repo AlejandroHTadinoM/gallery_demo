@@ -13,10 +13,12 @@
   "author": "Alejandro H Tadino M",
   "license": "ISC",
   "devDependencies": {
+    "browser-sync": "^2.18.8",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.1",
     "gulp-clean-css": "^3.0.4",
     "gulp-concat": "^2.6.1",
+    "gulp-imagemin": "^3.2.0",
     "gulp-pug": "^3.3.0",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
